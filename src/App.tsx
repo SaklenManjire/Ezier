@@ -1,1123 +1,881 @@
-import { useState } from 'react';
-import emailjs from "@emailjs/browser";
+import { useEffect, useState, type FormEvent } from 'react';
+import emailjs from '@emailjs/browser';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowRight,
+  CheckCircle,
+  ChevronRight,
+  Globe,
+  Mail,
+  MapPin,
+  Menu,
+  Palette,
+  Phone,
+  RefreshCw,
+  Send,
+  Shield,
+  Smartphone,
+  Target,
+  Users,
+  X,
+  Zap,
+} from 'lucide-react';
+import PrivacyPolicy from './Pages/PrivacyPolicy';
+import TermsOfService from './Pages/TermsOfServices';
 
-interface AppProps {
-  onNavigate?: (page: 'home' | 'terms' | 'privacy') => void;
+type Page = 'home' | 'terms' | 'privacy';
+
+type Service = {
+  id: string;
+  title: string;
+  summary: string;
+  detail: string;
+  benefit: string;
+  icon: typeof Smartphone;
+  points: string[];
+};
+
+const services: Service[] = [
+  {
+    id: 'apps',
+    title: 'Custom Mobile Apps',
+    summary:
+      'Native and cross-platform apps that keep your customers engaged and coming back.',
+    detail:
+      'We build focused mobile products with seamless flows, clear UX, and the features customers actually use. Push notifications, loyalty journeys, and clean performance help your business stay present after the first sale.',
+    benefit: 'Increase customer lifetime value',
+    icon: Smartphone,
+    points: [
+      'Native or cross-platform development based on your budget and goal',
+      'Push notifications and retention flows for repeat engagement',
+      'Loyalty, booking, ordering, or member features built around your use case',
+    ],
+  },
+  {
+    id: 'websites',
+    title: 'High-Converting Websites',
+    summary:
+      'Websites designed for one purpose: to turn visitors into customers.',
+    detail:
+      'We plan every section around clarity, trust, and action. Fast loading pages, strong mobile experience, and clear call-to-action placement help your website work as a business tool, not just a brochure.',
+    benefit: 'Generate more leads and sales',
+    icon: Globe,
+    points: [
+      'Landing pages and websites built around your real conversion goal',
+      'Mobile-first layouts, fast performance, and technical polish',
+      'Clear messaging structure that helps visitors understand and contact you quickly',
+    ],
+  },
+  {
+    id: 'design',
+    title: 'Clean UI/UX Design',
+    summary:
+      'User experience that guides customers to take action.',
+    detail:
+      'We remove friction. Intuitive navigation, clear hierarchy, and confident interface design make the experience feel easy and trustworthy from the first click to the final action.',
+    benefit: 'Higher conversions, lower bounce rates',
+    icon: Palette,
+    points: [
+      'User flows and layouts that support decision-making',
+      'Interface design that feels modern, clean, and easy to trust',
+      'Design systems and components that keep your product consistent',
+    ],
+  },
+  {
+    id: 'support',
+    title: 'Maintenance & Support',
+    summary:
+      'Your digital asset is a long-term investment. We keep it updated, secure, and optimized.',
+    detail:
+      'Launching is not the end. We stay available for improvements, fixes, content updates, and performance checks so your website or app keeps doing its job without becoming outdated or fragile.',
+    benefit: 'Peace of mind, ongoing performance',
+    icon: Shield,
+    points: [
+      'Updates, fixes, and careful post-launch support',
+      'Security, monitoring, and performance improvements over time',
+      'A reliable point of contact instead of being left alone after launch',
+    ],
+  },
+];
+
+const navItems = [
+  { label: 'Services', section: 'services' },
+  { label: 'Approach', section: 'approach' },
+  { label: 'Process', section: 'process' },
+  { label: 'Contact', section: 'contact' },
+];
+
+const contactEmail = 'ezier.agency@gmail.com';
+
+function getPageFromHash(): Page {
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+
+  if (hash === 'terms') {
+    return 'terms';
+  }
+
+  if (hash === 'privacy') {
+    return 'privacy';
+  }
+
+  return 'home';
 }
 
-const App = ({ onNavigate }: AppProps) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    project: ''
-  });
+function Navbar({ onSectionClick }: { onSectionClick: (section: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
- const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
 
-  const templateParams = {
-    name: formData.name,
-    email: formData.email,
-    phone: formData.phone,
-    project: formData.project
-  };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
 
-  emailjs
-    .send(
-      "service_uu4uyob",
-      "template_8wel65k",
-      templateParams,
-      "QJiDNvg8RqWrNzp5n"
-    )
-    .then(
-      () => {
-        alert("Message sent successfully!");
-        setFormData({ name: "", email: "", phone: "", project: "" });
-      },
-      (error) => {
-        alert("Failed to send message.");
-        console.log(error);
-      }
-    );
-};
-  const portfolioItems = [
-    {
-      title: "Vishesh Aushadhi – Natural Fungal Care Solution",
-      problem:
-        "The brand lacked an online presence and customers were unaware of its natural, herbal-based permanent fungal infection solution. There was no digital platform to educate users about product benefits, ingredients, and safe usage.",
-      solution:
-        "Built a modern product website with detailed ingredient breakdown, benefits section, customer testimonials, FAQ section, and an order inquiry form with validation. Integrated WhatsApp ordering and promotional banners to increase direct conversions.",
-      result:
-        "300% increase in online inquiries within 3 months and strong brand trust built through educational content and transparent ingredient showcase.",
-      image:
-        "https://visheshcream.in/uploads/Screenshot%20(164).png",
-    }
-  ];
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const testimonials = [
-    {
-      name: "Mohammad Yusuf Shaikh",
-      role: "Founder, Vishesh Cream",
-      content:
-        "Working with the development team completely transformed our brand presence. Before the website, we relied only on offline sales. Now customers understand our natural fungal care solution, trust our ingredients, and reach out directly through online inquiries. The digital platform helped us build credibility and scale faster than we expected.",
-      image:
-        "https://res.cloudinary.com/dze5u38e8/image/upload/e_enhance/yusuf_shaikh_kmsh6z.jpg",
-    },
-  ];
-
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    setMobileMenuOpen(false);
+  const handleClick = (section: string) => {
+    setOpen(false);
+    onSectionClick(section);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-gray-900 tracking-tight">
-            Ezier<span className="text-blue-600">.</span>
-          </div>
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled ? 'border-b border-white/10 bg-[#050510]/88 backdrop-blur-xl' : 'bg-transparent'
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
+        <button
+          type="button"
+          onClick={() => handleClick('home')}
+          className="flex items-center gap-3 text-left"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white">
+            <img src="public/Logo.png" />
+          </span>
+          <span>
+            <span className="block font-display text-xl font-bold tracking-[0.2em] text-white">EZIER</span>
+            <span className="block text-xs uppercase tracking-[0.3em] text-white/45">Web and product agency</span>
+          </span>
+        </button>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+        <nav className="hidden items-center gap-8 md:flex">
+          {navItems.map((item) => (
             <button
-              onClick={() => scrollToSection("services")}
-              className="text-gray-600 hover:text-gray-900 transition"
+              key={item.section}
+              type="button"
+              onClick={() => handleClick(item.section)}
+              className="text-sm font-medium text-white/70 transition hover:text-white"
             >
-              Services
+              {item.label}
             </button>
-            <button
-              onClick={() => scrollToSection("portfolio")}
-              className="text-gray-600 hover:text-gray-900 transition"
-            >
-              Portfolio
-            </button>
-            <button
-              onClick={() => scrollToSection("process")}
-              className="text-gray-600 hover:text-gray-900 transition"
-            >
-              Process
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="text-gray-600 hover:text-gray-900 transition"
-            >
-              Contact
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="bg-gray-900 text-white px-6 py-2.5 rounded-full hover:bg-gray-800 transition font-medium"
-            >
-              Get Started
-            </button>
-          </div>
+          ))}
+        </nav>
 
-          {/* Mobile Menu Button */}
+        <div className="hidden md:block">
           <button
-            className="md:hidden text-gray-900"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            type="button"
+            onClick={() => handleClick('contact')}
+            className="rounded-full border border-white/10 bg-white px-5 py-2.5 text-sm font-semibold text-[#050510] transition hover:scale-[1.02]"
           >
-            {mobileMenuOpen ? (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            )}
+            Start a project
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-4">
-            <button
-              onClick={() => scrollToSection("services")}
-              className="block text-gray-600 hover:text-gray-900 transition py-2"
-            >
-              Services
-            </button>
-            <button
-              onClick={() => scrollToSection("portfolio")}
-              className="block text-gray-600 hover:text-gray-900 transition py-2"
-            >
-              Portfolio
-            </button>
-            <button
-              onClick={() => scrollToSection("process")}
-              className="block text-gray-600 hover:text-gray-900 transition py-2"
-            >
-              Process
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="block text-gray-600 hover:text-gray-900 transition py-2"
-            >
-              Contact
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="w-full bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-            >
-              Get Started
-            </button>
-          </div>
-        )}
-      </nav>
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className="rounded-full border border-white/10 bg-white/5 p-2 text-white md:hidden"
+          aria-label="Toggle navigation"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-6">
-              Stop Losing Customers to Competitors.
+      <AnimatePresence>
+        {open ? (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            className="border-b border-white/10 bg-[#050510]/96 px-5 pb-5 backdrop-blur-xl md:hidden"
+          >
+            <div className="mx-auto flex max-w-7xl flex-col gap-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.section}
+                  type="button"
+                  onClick={() => handleClick(item.section)}
+                  className="rounded-2xl border border-white/8 bg-white/4 px-4 py-3 text-left text-sm text-white/80"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </header>
+  );
+}
+
+function Hero({ onContactClick }: { onContactClick: () => void }) {
+  return (
+    <section id="home" className="relative overflow-hidden bg-[#050510] px-5 pb-24 pt-32 sm:px-8 sm:pt-36">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(91,79,255,0.22),transparent_34%),radial-gradient(circle_at_70%_20%,rgba(0,163,255,0.18),transparent_28%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.06),transparent_35%)]" />
+      <div className="absolute inset-0 hero-grid opacity-40" />
+      <div className="absolute inset-x-0 bottom-0 top-[38%] border-t border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))]" />
+
+      <div className="relative mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-4xl"
+        >
+          <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 backdrop-blur-xl">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            Honest design and development for businesses that need clients, not agency hype.
+          </div>
+
+          <div className="space-y-6">
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl md:text-6xl">
+              Beautiful websites and apps that make visitors feel ready to trust you.
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed">
-              We build high-performance apps and websites that turn visitors
-              into paying customers.
+            <p className="max-w-2xl text-lg leading-8 text-white/68 sm:text-xl">
+              We are an early-stage agency, so we keep our promise simple: clear thinking, clean execution,
+              strong UI, and digital experiences built to help you win real clients.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-              <button
-                onClick={() => scrollToSection("contact")}
-                className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30"
-              >
-                Get a Free Strategy Call
-              </button>
-              <button
-                onClick={() => scrollToSection("portfolio")}
-                className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-full text-lg font-semibold hover:border-gray-900 hover:text-gray-900 transition"
-              >
-                See Our Work
-              </button>
-            </div>
-            <div className="flex flex-wrap justify-center gap-6 text-gray-600">
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-green-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Transparent Pricing
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-green-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Fast Delivery
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-green-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Long-Term Support
-              </span>
-            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Problem Section */}
-      <section className="py-20 px-6 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            Your Business Deserves More Than Just a Basic Website.
-          </h2>
-          <p className="text-xl text-gray-400 text-center max-w-3xl mx-auto mb-16">
-            In today's digital world, your online presence isn't just a
-            nice-to-have—it's essential for survival.
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-red-500/50 transition">
-              <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mb-6">
-                <svg
-                  className="w-7 h-7 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
-                Slow Websites Lose Customers
-              </h3>
-              <p className="text-gray-400">
-                40% of people leave a website that takes more than 3 seconds to
-                load. Every second counts.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-red-500/50 transition">
-              <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mb-6">
-                <svg
-                  className="w-7 h-7 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
-                No Online Presence = Lost Revenue
-              </h3>
-              <p className="text-gray-400">
-                97% of consumers search online for local businesses. If you're
-                not there, your competitors are.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-red-500/50 transition">
-              <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mb-6">
-                <svg
-                  className="w-7 h-7 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
-                Bad Design = No Trust
-              </h3>
-              <p className="text-gray-400">
-                75% of people judge a company's credibility based on website
-                design. First impressions matter.
-              </p>
-            </div>
-            <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-red-500/50 transition">
-              <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mb-6">
-                <svg
-                  className="w-7 h-7 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3">
-                No App = Customers Go to Competitors
-              </h3>
-              <p className="text-gray-400">
-                Mobile apps increase customer loyalty and retention. If you
-                don't have one, someone else will.
-              </p>
-            </div>
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <button
+              type="button"
+              onClick={onContactClick}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-base font-semibold text-[#050510] transition hover:scale-[1.02]"
+            >
+              Send your brief
+              <ArrowRight className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onContactClick}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+            >
+              Talk about your website
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* Solution Section */}
-      <section id="services" className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            We Build Digital Assets That Make You Money.
-          </h2>
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-            Stop thinking about "websites" and "apps." Think about
-            revenue-generating tools that work 24/7.
-          </p>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="group bg-gradient-to-br from-gray-50 to-white p-10 rounded-3xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Custom Mobile Apps</h3>
-              <p className="text-gray-600 mb-6">
-                Native and cross-platform apps that keep your customers engaged
-                and coming back. Push notifications, loyalty programs, and
-                seamless experiences that drive repeat business.
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15 }}
+          className="relative mt-16 overflow-hidden border-t border-white/10 pt-10"
+        >
+          <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+            <div className="space-y-6">
+              <p className="max-w-xl text-sm uppercase tracking-[0.26em] text-white/45">
+                Built to engage, explain, and convert.
               </p>
-              <div className="flex items-center text-blue-600 font-semibold">
-                <span>Increase customer lifetime value</span>
-                <svg
-                  className="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {[
+                  'Clear positioning so a client understands your value fast',
+                  'Motion and polish that make your work feel premium',
+                  'Contact flows designed to turn interest into inquiries',
+                ].map((item) => (
+                  <div key={item} className="border-t border-white/10 pt-4 text-sm leading-7 text-white/68">
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="group bg-gradient-to-br from-gray-50 to-white p-10 rounded-3xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">
-                High-Converting Websites
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Websites designed for one purpose: to turn visitors into
-                customers. Fast loading, mobile-optimized, and built with your
-                business goals front and center.
-              </p>
-              <div className="flex items-center text-blue-600 font-semibold">
-                <span>Generate more leads and sales</span>
-                <svg
-                  className="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="group bg-gradient-to-br from-gray-50 to-white p-10 rounded-3xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Clean UI/UX Design</h3>
-              <p className="text-gray-600 mb-6">
-                User experience that guides customers to take action. Intuitive
-                navigation, clear calls-to-action, and design that builds trust
-                from the first click.
-              </p>
-              <div className="flex items-center text-blue-600 font-semibold">
-                <span>Higher conversions, lower bounce rates</span>
-                <svg
-                  className="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="group bg-gradient-to-br from-gray-50 to-white p-10 rounded-3xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Maintenance & Support</h3>
-              <p className="text-gray-600 mb-6">
-                Your digital asset is a long-term investment. We keep it
-                updated, secure, and optimized so it continues to perform at its
-                best for years to come.
-              </p>
-              <div className="flex items-center text-blue-600 font-semibold">
-                <span>Peace of mind, ongoing performance</span>
-                <svg
-                  className="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Results / Benefits Section */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            What You Actually Get
-          </h2>
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-            We don't just deliver code. We deliver business results.
-          </p>
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <div className="bg-white p-8 rounded-2xl text-center shadow-sm hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg">More Leads</h3>
-              <p className="text-gray-500 text-sm mt-2">
-                Capture opportunities you were missing
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl text-center shadow-sm hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg">Better Brand Image</h3>
-              <p className="text-gray-500 text-sm mt-2">
-                Stand out from competitors
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl text-center shadow-sm hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg">Higher Conversions</h3>
-              <p className="text-gray-500 text-sm mt-2">
-                Turn visitors into customers
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl text-center shadow-sm hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg">Faster Performance</h3>
-              <p className="text-gray-500 text-sm mt-2">
-                Keep customers engaged
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl text-center shadow-sm hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg">Scalable Growth</h3>
-              <p className="text-gray-500 text-sm mt-2">
-                Built for your future success
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Portfolio Section */}
-      <section id="portfolio" className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            Real Work. Real Results.
-          </h2>
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-            Don't just take our word for it. See what we've accomplished for
-            businesses like yours.
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {portfolioItems.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-56 object-cover group-hover:scale-105 transition duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="relative ml-auto w-full max-w-xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_30px_120px_rgba(0,0,0,0.35)]"
+            >
+              <div className="mb-4 flex items-center justify-between border-b border-white/8 pb-4">
+                <div className="flex gap-2">
+                  <span className="h-3 w-3 rounded-full bg-white/20" />
+                  <span className="h-3 w-3 rounded-full bg-white/20" />
+                  <span className="h-3 w-3 rounded-full bg-white/20" />
                 </div>
-                <div className="p-8">
-                  <h3 className="text-xl font-bold mb-4">{item.title}</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-sm font-semibold text-red-500 uppercase tracking-wide">
-                        Problem
-                      </span>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {item.problem}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-blue-500 uppercase tracking-wide">
-                        Solution
-                      </span>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {item.solution}
-                      </p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-xl">
-                      <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">
-                        Result
-                      </span>
-                      <p className="text-green-800 font-bold mt-1">
-                        {item.result}
-                      </p>
-                    </div>
+                <span className="text-xs uppercase tracking-[0.24em] text-white/45">Client-first layout</span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="h-44 rounded-[1.5rem] bg-[radial-gradient(circle_at_top,rgba(97,84,255,0.55),rgba(7,7,20,0.4)_52%),linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.01))] p-6">
+                  <div className="max-w-xs space-y-3">
+                    <div className="h-3 w-24 rounded-full bg-white/35" />
+                    <div className="h-8 w-full rounded-full bg-white/18" />
+                    <div className="h-3 w-4/5 rounded-full bg-white/18" />
+                    <div className="h-10 w-36 rounded-full bg-white" />
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.5rem] border border-white/8 bg-white/4 p-4 text-sm text-white/70">
+                    Better structure, cleaner story, stronger CTA placement.
+                  </div>
+                  <div className="rounded-[1.5rem] border border-white/8 bg-white/4 p-4 text-sm text-white/70">
+                    A website that looks strong and helps a client feel safe reaching out.
                   </div>
                 </div>
               </div>
-            ))}
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-      {/* Why Choose Us Section */}
-      <section className="py-20 px-6 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            Why Businesses Trust Ezier
+function ServicesSection() {
+  const [activeService, setActiveService] = useState(services[0]);
+
+  return (
+    <section id="services" className="bg-[#050510] px-5 py-24 sm:px-8">
+      <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.86fr_1.14fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-xl"
+        >
+          <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/45">Services</p>
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            The work we do best right now.
           </h2>
-          <p className="text-xl text-gray-400 text-center max-w-3xl mx-auto mb-16">
-            We're not just another agency. We're your partners in growth.
+          <p className="mt-6 text-lg leading-8 text-white/68">
+            No fake full-service claims. We focus on the digital work that helps a business look better,
+            feel more trustworthy, and convert more of the attention it already gets.
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-gray-800 p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-blue-400 mb-2">3</div>
-              <p className="text-gray-300">
-                Young, hungry developers dedicated to your success
-              </p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-2xl text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-6 h-6 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          <div className="mt-10 space-y-3">
+            {services.map((service) => {
+              const Icon = service.icon;
+              const isActive = service.id === activeService.id;
+
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => setActiveService(service)}
+                  className={`flex w-full items-start justify-between gap-4 border-t px-0 py-5 text-left transition ${
+                    isActive ? 'border-white text-white' : 'border-white/10 text-white/58 hover:text-white/80'
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-300">
-                Personal attention you won't get from big agencies
-              </p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-2xl text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-6 h-6 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-300">
-                Transparent communication every step of the way
-              </p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-2xl text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-6 h-6 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-300">
-                Long-term partnership, not one-off project
-              </p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-2xl text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-6 h-6 text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-300">
-                Premium quality at affordable rates
-              </p>
-            </div>
+                  <div className="flex items-start gap-4">
+                    <span className={`mt-1 rounded-2xl border p-3 ${isActive ? 'border-white/14 bg-white/8' : 'border-white/8 bg-white/4'}`}>
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <div className="text-lg font-medium">{service.title}</div>
+                      <div className="mt-2 max-w-md text-sm leading-7 text-white/55">{service.summary}</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`mt-1 h-5 w-5 transition ${isActive ? 'translate-x-1 text-white' : 'text-white/35'}`} />
+                </button>
+              );
+            })}
           </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* Process Section */}
-      <section id="process" className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            Simple 4-Step Process
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl sm:p-10"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeService.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35 }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.26em] text-white/45">Selected service</p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white sm:text-3xl">{activeService.title}</h3>
+                </div>
+                <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300">
+                  {activeService.benefit}
+                </div>
+              </div>
+
+              <p className="mt-6 max-w-2xl text-base leading-8 text-white/68 sm:text-lg">{activeService.detail}</p>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {activeService.points.map((point) => (
+                  <div key={point} className="flex gap-3 border-t border-white/10 pt-4 text-sm leading-7 text-white/72">
+                    <CheckCircle className="mt-1 h-4 w-4 flex-none text-white" />
+                    <span>{point}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function ApproachSection() {
+  return (
+    <section id="approach" className="border-y border-white/8 bg-[#060612] px-5 py-24 sm:px-8">
+      <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/45">Approach</p>
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            What clients get from us is clarity.
           </h2>
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-            We've made building your digital asset simple and stress-free.
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="grid gap-10 sm:grid-cols-2"
+        >
+          {[
+            {
+              icon: Target,
+              title: 'Real positioning',
+              copy: 'We shape the story so a visitor understands who you help, what you do, and why they should trust you.',
+            },
+            {
+              icon: Zap,
+              title: 'Intentional motion',
+              copy: 'Animation is used to support hierarchy and polish, not distract from your message or slow the experience down.',
+            },
+            {
+              icon: Users,
+              title: 'Honest communication',
+              copy: 'We do not overpromise. If something needs more time, more budget, or more testing, we will say that clearly.',
+            },
+            {
+              icon: Shield,
+              title: 'Launch with support',
+              copy: 'You do not get dropped after delivery. We stay available for fixes, updates, and practical next steps.',
+            },
+          ].map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+                className="border-t border-white/10 pt-5"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                <p className="mt-3 text-base leading-8 text-white/66">{item.copy}</p>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function ProcessSection() {
+  return (
+    <section id="process" className="bg-[#050510] px-5 py-24 sm:px-8">
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl"
+        >
+          <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/45">Process</p>
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            A simple process that keeps the work moving.
+          </h2>
+        </motion.div>
+
+        <div className="mt-14 grid gap-8 lg:grid-cols-4">
+          {[
+            {
+              step: '01',
+              title: 'Understand the goal',
+              copy: 'We learn what you sell, who you want to reach, and what the website or app needs to achieve.',
+            },
+            {
+              step: '02',
+              title: 'Shape the structure',
+              copy: 'We plan content, layout, and user flow so every section has a clear role in conversion.',
+            },
+            {
+              step: '03',
+              title: 'Design and build',
+              copy: 'We create the interface, motion, and responsive experience with a sharp focus on quality.',
+            },
+            {
+              step: '04',
+              title: 'Launch and refine',
+              copy: 'We help you go live, review feedback, and support the next improvements after launch.',
+            },
+          ].map((item, index) => (
+            <motion.div
+              key={item.step}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.45, delay: index * 0.08 }}
+              className="border-t border-white/10 pt-5"
+            >
+              <div className="text-sm font-medium uppercase tracking-[0.24em] text-white/45">{item.step}</div>
+              <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-base leading-8 text-white/66">{item.copy}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactSection() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    service: '',
+    budget: '',
+    message: '',
+  });
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [notice, setNotice] = useState('');
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setNotice('');
+    setSubmitState('sending');
+
+const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      service: formData.service || 'Not selected',
+      budget: formData.budget || 'Not shared',
+      message: formData.message,
+      to_email: contactEmail,
+    };
+
+    try {
+      if (!serviceId || !templateId || !publicKey) {
+        const subject = encodeURIComponent(`New project inquiry from ${formData.name}`);
+        const body = encodeURIComponent(
+          [
+            `Name: ${formData.name}`,
+            `Email: ${formData.email}`,
+            `Service: ${formData.service || 'Not selected'}`,
+            `Budget: ${formData.budget || 'Not shared'}`,
+            '',
+            'Project details:',
+            formData.message,
+          ].join('\n'),
+        );
+
+        window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+        setSubmitState('idle');
+        setNotice('EmailJS keys are not configured yet, so we opened your email app with the message pre-filled.');
+        return;
+      }
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+      setFormData({ name: '', email: '', service: '', budget: '', message: '' });
+      setSubmitState('success');
+    } catch {
+      setSubmitState('error');
+      setNotice(`Something went wrong. Please email us directly at ${contactEmail}.`);
+    }
+  };
+
+  return (
+    <section id="contact" className="border-t border-white/8 bg-[#060612] px-5 py-24 sm:px-8">
+      <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="mb-4 text-sm uppercase tracking-[0.24em] text-white/45">Contact</p>
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            Tell us what you want to build.
+          </h2>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-white/68">
+            If the project fits our skill set, we will tell you clearly. If something needs a larger team or a
+            different scope, we will tell you that clearly too.
           </p>
-          <div className="grid md:grid-cols-4 gap-8 relative">
-            <div className="hidden md:block absolute top-16 left-1/4 right-1/4 h-0.5 bg-gray-200"></div>
+
+          <div className="mt-10 space-y-5">
             {[
-              {
-                step: "01",
-                title: "Free Consultation",
-                description:
-                  "We discuss your business goals and challenges. No sales pitch, just honest advice.",
-                icon: "📞",
-              },
-              {
-                step: "02",
-                title: "Strategy & Planning",
-                description:
-                  "We create a clear roadmap for your project with timeline and transparent pricing.",
-                icon: "📋",
-              },
-              {
-                step: "03",
-                title: "Development",
-                description:
-                  "Our team builds your solution with regular updates so you're always in the loop.",
-                icon: "💻",
-              },
-              {
-                step: "04",
-                title: "Launch & Support",
-                description:
-                  "We launch your project and provide ongoing support to ensure long-term success.",
-                icon: "🚀",
-              },
-            ].map((item, index) => (
-              <div key={index} className="relative text-center">
-                <div className="w-32 h-32 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl shadow-lg shadow-blue-600/30 relative z-10">
-                  {item.icon}
-                </div>
-                <div className="text-sm font-bold text-blue-600 mb-2">
-                  {item.step}
-                </div>
-                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              { icon: Mail, label: 'Email', value: contactEmail, href: `mailto:${contactEmail}` },
+              { icon: Phone, label: 'Reply speed', value: 'Usually within 24 hours', href: '#' },
+              { icon: MapPin, label: 'Location', value: 'India, working worldwide', href: '#' },
+            ].map((item) => {
+              const Icon = item.icon;
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
-            What Our Clients Say
-          </h2>
-          <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-            Real success stories from businesses we've helped grow.
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-8 rounded-3xl shadow-sm">
-                <div className="flex items-center gap-4 mb-6">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-14 h-14 rounded-full object-cover"
-                  />
+              return (
+                <div key={item.label} className="flex items-start gap-4 border-t border-white/10 pt-5">
+                  <span className="mt-1 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white">
+                    <Icon className="h-5 w-5" />
+                  </span>
                   <div>
-                    <h4 className="font-bold">{testimonial.name}</h4>
-                    <p className="text-gray-500 text-sm">{testimonial.role}</p>
+                    <div className="text-sm uppercase tracking-[0.2em] text-white/40">{item.label}</div>
+                    {item.href === '#' ? (
+                      <p className="mt-2 text-base text-white/80">{item.value}</p>
+                    ) : (
+                      <a href={item.href} className="mt-2 inline-block text-base text-white transition hover:text-white/70">
+                        {item.value}
+                      </a>
+                    )}
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed">
-                  "{testimonial.content}"
-                </p>
-                <div className="flex gap-1 mt-6">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-5 h-5 text-yellow-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* CTA Section */}
-      <section id="contact" className="py-24 px-6 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Let's Build Something That Grows Your Business.
-          </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Book your free strategy call today. We'll discuss your goals and
-            create a clear plan to achieve them.
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl sm:p-10"
+        >
+          {submitState === 'success' ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex min-h-[420px] flex-col items-start justify-center"
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400/12 text-emerald-300">
+                <CheckCircle className="h-8 w-8" />
+              </div>
+              <h3 className="mt-6 text-3xl font-semibold text-white">Message sent successfully.</h3>
+              <p className="mt-4 max-w-lg text-base leading-8 text-white/68">
+                Thank you for reaching out. We will review your brief and reply with a clear next step.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSubmitState('idle')}
+                className="mt-8 rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/6"
+              >
+                Send another message
+              </button>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block text-sm text-white/76">
+                  Name
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(event) => setFormData({ ...formData, name: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
+                    placeholder="Your name"
+                  />
+                </label>
+                <label className="block text-sm text-white/76">
+                  Email
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
+                    placeholder="you@business.com"
+                  />
+                </label>
+              </div>
 
-          <div className="bg-white p-8 md:p-10 rounded-3xl max-w-xl mx-auto">
-            <h3 className="text-gray-900 text-2xl font-bold mb-6">
-              Book Your Free Consultation Now
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-                className="w-full px-6 py-4 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
-                className="w-full px-6 py-4 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              />
-              <input
-                type="tel"
-                placeholder="Your Phone (optional)"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                className="w-full px-6 py-4 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              />
-              <textarea
-                placeholder="Tell us about your project"
-                value={formData.project}
-                onChange={(e) =>
-                  setFormData({ ...formData, project: e.target.value })
-                }
-                required
-                rows={4}
-                className="w-full px-6 py-4 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
-              />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block text-sm text-white/76">
+                  Service
+                  <select
+                    value={formData.service}
+                    onChange={(event) => setFormData({ ...formData, service: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
+                  >
+                    <option value="" className="bg-[#0b0b17]">Choose a service</option>
+                    <option value="Custom Mobile Apps" className="bg-[#0b0b17]">Custom Mobile Apps</option>
+                    <option value="High-Converting Websites" className="bg-[#0b0b17]">High-Converting Websites</option>
+                    <option value="Clean UI/UX Design" className="bg-[#0b0b17]">Clean UI/UX Design</option>
+                    <option value="Maintenance & Support" className="bg-[#0b0b17]">Maintenance & Support</option>
+                  </select>
+                </label>
+                <label className="block text-sm text-white/76">
+                  Budget
+                  <select
+                    value={formData.budget}
+                    onChange={(event) => setFormData({ ...formData, budget: event.target.value })}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
+                  >
+                    <option value="" className="bg-[#0b0b17]">Choose a range</option>
+                    <option value="Under $500" className="bg-[#0b0b17]">Under $500</option>
+                    <option value="$500 - $1,500" className="bg-[#0b0b17]">$500 - $1,500</option>
+                    <option value="$1,500 - $3,000" className="bg-[#0b0b17]">$1,500 - $3,000</option>
+                    <option value="$3,000+" className="bg-[#0b0b17]">$3,000+</option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="block text-sm text-white/76">
+                Project details
+                <textarea
+                  required
+                  rows={6}
+                  value={formData.message}
+                  onChange={(event) => setFormData({ ...formData, message: event.target.value })}
+                  className="mt-2 w-full rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
+                  placeholder="What are you building, who is it for, and what result do you want from it?"
+                />
+              </label>
+
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition transform hover:scale-[1.02]"
+                disabled={submitState === 'sending'}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-base font-semibold text-[#050510] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Get Your Free Strategy Call
+                {submitState === 'sending' ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Sending message
+                  </>
+                ) : (
+                  <>
+                    Send message
+                    <Send className="h-4 w-4" />
+                  </>
+                )}
               </button>
-            </form>
-            <p className="text-gray-500 text-sm mt-4">
-              🔥 Limited client slots available. We only take on projects where
-              we can deliver exceptional results.
-            </p>
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <div className="text-2xl font-bold mb-4">
-                Ezier<span className="text-blue-400">.</span>
-              </div>
-              <p className="text-gray-400 mb-6">
-                Building digital assets that grow businesses. Your success is
-                our mission.
+              {notice ? (
+                <p className={`text-sm leading-7 ${submitState === 'error' ? 'text-rose-300' : 'text-amber-200'}`}>
+                  {notice}
+                </p>
+              ) : null}
+
+              <p className="text-sm leading-7 text-white/48">
+                EmailJS is wired in this form. Add your EmailJS keys to your Vite environment to send messages directly from the website.
               </p>
-              <a
-                href="https://wa.me/917841861132?text=Hello"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-                WhatsApp Us
-              </a>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Company</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Portfolio
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Blog
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Contact</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li>ezier.agency@gmail.comv</li>
-                <li>+91 7841861132/8484814483</li>
-                <li>Sangli,India</li>
-              </ul>
-              <div className="flex gap-4 mt-6">
-                {/* Instagram */}
-                <a
-                  href="https://instagram.com/ezier.agency"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M7.75 2C4.574 2 2 4.574 2 7.75v8.5C2 19.426 4.574 22 7.75 22h8.5C19.426 22 22 19.426 22 16.25v-8.5C22 4.574 19.426 2 16.25 2h-8.5zm0 2h8.5A3.75 3.75 0 0120 7.75v8.5A3.75 3.75 0 0116.25 20h-8.5A3.75 3.75 0 014 16.25v-8.5A3.75 3.75 0 017.75 4zm8.75 1.5a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
-                  </svg>
-                </a>
+            </form>
+          )}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-                {/* Facebook */}
-                <a
-                 href="https://www.facebook.com/profile.php?id=61586515542211"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M22 12a10 10 0 10-11.5 9.9v-7h-2.3V12h2.3V9.7c0-2.3 1.4-3.6 3.5-3.6 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.4V12h2.4l-.4 2.9h-2v7A10 10 0 0022 12z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              © 2026 Ezier. All rights reserved.
-            </p>
-            <div className="flex gap-6 text-gray-400 text-sm">
-              <button
-                onClick={() => onNavigate?.("privacy")}
-                className="hover:text-white transition"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => onNavigate?.("terms")}
-                className="hover:text-white transition"
-              >
-                Terms of Service
-              </button>
-            </div>
-          </div>
+function Footer({ onNavigate }: { onNavigate: (page: Page) => void }) {
+  return (
+    <footer className="bg-[#050510] px-5 py-10 sm:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 border-t border-white/8 pt-8 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div className="font-display text-2xl font-bold uppercase tracking-[0.18em] text-white">EZIER</div>
+          <p className="mt-3 max-w-xl text-sm leading-7 text-white/52">
+            A small agency focused on websites, apps, and design systems that help businesses look stronger and convert better.
+          </p>
         </div>
-      </footer>
+
+        <div className="flex flex-wrap items-center gap-5 text-sm text-white/58">
+          <button type="button" onClick={() => onNavigate('privacy')} className="transition hover:text-white">
+            Privacy Policy
+          </button>
+          <button type="button" onClick={() => onNavigate('terms')} className="transition hover:text-white">
+            Terms of Service
+          </button>
+          <a href={`mailto:${contactEmail}`} className="transition hover:text-white">
+            {contactEmail}
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function HomePage({ onNavigate }: { onNavigate: (page: Page) => void }) {
+  const scrollToSection = (section: string) => {
+    const element = document.getElementById(section);
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  return (
+    <div className="bg-[#050510] text-white">
+      <Navbar onSectionClick={scrollToSection} />
+      <main>
+        <Hero onContactClick={() => scrollToSection('contact')} />
+        <ServicesSection />
+        <ApproachSection />
+        <ProcessSection />
+        <ContactSection />
+      </main>
+      <Footer onNavigate={onNavigate} />
     </div>
   );
-};
+}
 
-export default App;
+export function App() {
+  const [page, setPage] = useState<Page>('home');
+
+  useEffect(() => {
+    const syncRoute = () => setPage(getPageFromHash());
+
+    syncRoute();
+    window.addEventListener('hashchange', syncRoute);
+
+    return () => window.removeEventListener('hashchange', syncRoute);
+  }, []);
+
+  const handleNavigate = (nextPage: Page) => {
+    if (nextPage === 'home') {
+      window.location.hash = 'home';
+      return;
+    }
+
+    window.location.hash = nextPage;
+  };
+
+  if (page === 'privacy') {
+    return <PrivacyPolicy onNavigate={handleNavigate} />;
+  }
+
+  if (page === 'terms') {
+    return <TermsOfService onNavigate={handleNavigate} />;
+  }
+
+  return <HomePage onNavigate={handleNavigate} />;
+}

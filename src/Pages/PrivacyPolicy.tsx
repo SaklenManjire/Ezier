@@ -1,147 +1,101 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from 'react';
 
 interface PrivacyPolicyProps {
   onNavigate?: (page: 'home' | 'terms' | 'privacy') => void;
 }
 
-export default function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
-    
-         useEffect(() => {
-           window.scrollTo(0, 0);
-         }, []);
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="border-t border-white/10 pt-8">
+      <h2 className="text-2xl font-semibold text-white">{title}</h2>
+      <div className="mt-4 space-y-4 text-base leading-8 text-white/70">{children}</div>
+    </section>
+  );
+}
 
+export default function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleHomeClick = () => {
     if (onNavigate) {
       onNavigate('home');
-    } else {
-      window.location.href = '/';
+      return;
     }
+
+    window.location.href = '/';
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <button onClick={handleHomeClick} className="text-2xl font-bold text-gray-900 hover:opacity-80 transition">
+    <div className="min-h-screen bg-[#050510] text-white">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+          <button type="button" onClick={handleHomeClick} className="font-display text-2xl font-bold uppercase tracking-[0.16em] text-white">
             Ezier
           </button>
-          <button onClick={handleHomeClick} className="text-gray-600 hover:text-gray-900 transition">
+          <button type="button" onClick={handleHomeClick} className="text-sm text-white/68 transition hover:text-white">
             Back to Home
           </button>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-        <p className="text-gray-600 mb-8">Last Updated: 2026</p>
+      <main className="mx-auto max-w-3xl px-5 py-16 sm:px-8">
+        <h1 className="text-4xl font-semibold text-white sm:text-5xl">Privacy Policy</h1>
+        <p className="mt-4 text-sm uppercase tracking-[0.24em] text-white/45">Last updated: 2026</p>
 
-        <div className="prose prose-lg max-w-none text-gray-700 space-y-8">
-          <p>
+        <div className="mt-10 space-y-8">
+          <p className="text-lg leading-8 text-white/72">
             Ezier respects your privacy. This Privacy Policy explains how we collect, use, and protect your information.
           </p>
 
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Information We Collect</h2>
-            
-            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Personal Information</h3>
-            <p>We may collect:</p>
-            <ul className="list-disc list-inside space-y-2 mt-4">
-              <li>Name</li>
-              <li>Email address</li>
-              <li>Phone number</li>
-              <li>Business details</li>
-              <li>Project or inquiry information</li>
-            </ul>
+          <Section title="1. Information We Collect">
+            <h3 className="text-lg font-medium text-white">Personal Information</h3>
+            <p>We may collect your name, email address, phone number, business details, and project inquiry information.</p>
+            <h3 className="text-lg font-medium text-white">Technical Information</h3>
+            <p>Automatically collected data may include IP address, browser and device details, and website usage data.</p>
+          </Section>
 
-            <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">Technical Information</h3>
-            <p>Automatically collected data may include:</p>
-            <ul className="list-disc list-inside space-y-2 mt-4">
-              <li>IP address</li>
-              <li>Browser and device details</li>
-              <li>Website usage data</li>
-            </ul>
-          </section>
+          <Section title="2. How We Use Your Information">
+            <p>We use your information to respond to inquiries, provide and manage services, send proposals or service updates, and improve website and service quality.</p>
+            <p>We do not sell or rent your personal data.</p>
+          </Section>
 
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. How We Use Your Information</h2>
-            <p>We use your information to:</p>
-            <ul className="list-disc list-inside space-y-2 mt-4">
-              <li>Respond to inquiries</li>
-              <li>Provide and manage services</li>
-              <li>Send proposals or service updates</li>
-              <li>Improve website and service quality</li>
-            </ul>
-            <p className="mt-4">
-              We <strong>do not sell or rent</strong> your personal data.
-            </p>
-          </section>
+          <Section title="3. Sharing of Information">
+            <p>Your data may be shared only when required by law, with trusted service providers such as hosting or communication tools, or to protect Ezier's legal rights.</p>
+            <p>All third parties are expected to handle information confidentially.</p>
+          </Section>
 
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Sharing of Information</h2>
-            <p>Your data may be shared only:</p>
-            <ul className="list-disc list-inside space-y-2 mt-4">
-              <li>When required by law</li>
-              <li>With trusted service providers (hosting, communication tools)</li>
-              <li>To protect Ezier's legal rights</li>
-            </ul>
-            <p className="mt-4">All third parties are bound by confidentiality obligations.</p>
-          </section>
+          <Section title="4. Data Security">
+            <p>We use reasonable technical and organizational measures to protect your data. No online system can be guaranteed 100% secure.</p>
+          </Section>
 
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Data Security</h2>
+          <Section title="5. Data Retention">
+            <p>We retain personal data only for as long as necessary for service delivery, communication, or legal requirements.</p>
+          </Section>
+
+          <Section title="6. Your Rights">
+            <p>You may request access to your data, request correction or deletion, or withdraw consent for communication. Requests can be made by email.</p>
+          </Section>
+
+          <Section title="7. Policy Updates">
+            <p>This Privacy Policy may be updated periodically. Continued use of our website or services indicates acceptance of changes.</p>
+          </Section>
+
+          <Section title="8. Contact">
             <p>
-              We use reasonable technical and organizational measures to protect your data. However, no online system is 100% secure.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Data Retention</h2>
-            <p>
-              We retain personal data only as long as necessary for service delivery or legal requirements.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Your Rights</h2>
-            <p>You may:</p>
-            <ul className="list-disc list-inside space-y-2 mt-4">
-              <li>Request access to your data</li>
-              <li>Request correction or deletion</li>
-              <li>Withdraw consent for communication</li>
-            </ul>
-            <p className="mt-4">Requests can be made via email.</p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Policy Updates</h2>
-            <p>
-              This Privacy Policy may be updated periodically. Continued use of our website or services indicates acceptance of changes.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">8. Contact</h2>
-            <p>
-              <strong>Ezier</strong>
+              Ezier
               <br />
-              Email: <strong>ezier.agency@gmail.com</strong>
+              Email: ezier.agency@gmail.com
               <br />
               Location: India
             </p>
-          </section>
+          </Section>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 mt-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <p>&copy; 2026 Ezier. All rights reserved.</p>
-          </div>
-        </div>
+      <footer className="border-t border-white/10 bg-[#04040d]">
+        <div className="mx-auto max-w-6xl px-5 py-8 text-sm text-white/50 sm:px-8">Copyright 2026 Ezier. All rights reserved.</div>
       </footer>
     </div>
   );
