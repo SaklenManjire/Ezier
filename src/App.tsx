@@ -150,10 +150,7 @@ function Navbar({ onSectionClick }: { onSectionClick: (section: string) => void 
           type="button"
           onClick={() => handleClick('home')}
           className="flex items-center gap-3 text-left"
-        >
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white">
-            <img src="public/Logo.png" />
-          </span>
+        ></button>
           <span>
             <span className="block font-display text-xl font-bold tracking-[0.2em] text-white">EZIER</span>
             <span className="block text-xs uppercase tracking-[0.3em] text-white/45">Web and product agency</span>
