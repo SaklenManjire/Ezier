@@ -781,10 +781,6 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
                   {notice}
                 </p>
               ) : null}
-
-              <p className="text-sm leading-7 text-white/48">
-                EmailJS is wired in this form. Add your EmailJS keys to your Vite environment to send messages directly from the website.
-              </p>
             </form>
           )}
         </motion.div>
