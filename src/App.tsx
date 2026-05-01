@@ -19,11 +19,14 @@ import {
   Users,
   X,
   Zap,
+  Image, // ✅ FIXED (added)
 } from 'lucide-react';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import TermsOfService from './Pages/TermsOfServices';
 
 type Page = 'home' | 'terms' | 'privacy';
+
+import { LucideIcon } from 'lucide-react';
 
 type Service = {
   id: string;
@@ -31,7 +34,7 @@ type Service = {
   summary: string;
   detail: string;
   benefit: string;
-  icon: typeof Smartphone;
+  icon: LucideIcon; // ✅ better typing
   points: string[];
 };
 
@@ -42,7 +45,7 @@ const services: Service[] = [
     summary:
       'Native and cross-platform apps that keep your customers engaged and coming back.',
     detail:
-      'We build focused mobile products with seamless flows, clear UX, and the features customers actually use. Push notifications, loyalty journeys, and clean performance help your business stay present after the first sale.',
+      'We build focused mobile products with seamless flows, clear UX, and the features customers actually use.',
     benefit: 'Increase customer lifetime value',
     icon: Smartphone,
     points: [
@@ -55,15 +58,15 @@ const services: Service[] = [
     id: 'websites',
     title: 'High-Converting Websites',
     summary:
-      'Websites designed for one purpose: to turn visitors into customers.',
+      'Websites designed to turn visitors into customers.',
     detail:
-      'We plan every section around clarity, trust, and action. Fast loading pages, strong mobile experience, and clear call-to-action placement help your website work as a business tool, not just a brochure.',
+      'We structure every section around clarity, trust, and action to drive conversions.',
     benefit: 'Generate more leads and sales',
     icon: Globe,
     points: [
-      'Landing pages and websites built around your real conversion goal',
-      'Mobile-first layouts, fast performance, and technical polish',
-      'Clear messaging structure that helps visitors understand and contact you quickly',
+      'Conversion-focused layout',
+      'Mobile-first design',
+      'Clear messaging structure',
     ],
   },
   {
@@ -72,47 +75,49 @@ const services: Service[] = [
     summary:
       'User experience that guides customers to take action.',
     detail:
-      'We remove friction. Intuitive navigation, clear hierarchy, and confident interface design make the experience feel easy and trustworthy from the first click to the final action.',
+      'We remove friction with intuitive navigation and clean hierarchy.',
     benefit: 'Higher conversions, lower bounce rates',
     icon: Palette,
     points: [
-      'User flows and layouts that support decision-making',
-      'Interface design that feels modern, clean, and easy to trust',
-      'Design systems and components that keep your product consistent',
+      'Smart user flows',
+      'Modern UI design',
+      'Consistent design systems',
     ],
   },
+
+  // 🔥 YOUR NEW SERVICE
   {
-  id: 'thumbnails',
-  title: 'YouTube Thumbnail Optimization',
-  summary:
-    'Scroll-stopping thumbnails designed to increase clicks, views, and video performance.',
-  detail:
-    'We design high-converting thumbnails using proven viewer psychology, bold visual hierarchy, and platform-specific strategies. Each thumbnail is crafted to grab attention instantly and drive higher click-through rates (CTR), helping your content reach more people.',
-  benefit: 'Increase click-through rate and video views',
-  icon: Image,
-  points: [
-    'CTR-focused designs built using curiosity and emotional triggers',
-    'Clean, high-contrast visuals optimized for mobile viewers',
-    'A/B tested concepts to improve performance over time',
-  ],
-},
+    id: 'thumbnails',
+    title: 'YouTube Thumbnail Optimization',
+    summary:
+      'Scroll-stopping thumbnails designed to increase clicks and views.',
+    detail:
+      'We design high-converting thumbnails using psychology, contrast, and attention-driven visuals to improve CTR and video performance.',
+    benefit: 'Increase CTR and video views',
+    icon: Image,
+    points: [
+      'Emotion-driven and curiosity-based designs',
+      'High contrast, mobile-optimized visuals',
+      'A/B tested thumbnail concepts',
+    ],
+  },
+
   {
     id: 'support',
     title: 'Maintenance & Support',
     summary:
-      'Your digital asset is a long-term investment. We keep it updated, secure, and optimized.',
+      'We keep your product updated, secure, and optimized.',
     detail:
-      'Launching is not the end. We stay available for improvements, fixes, content updates, and performance checks so your website or app keeps doing its job without becoming outdated or fragile.',
-    benefit: 'Peace of mind, ongoing performance',
+      'Ongoing support for improvements, fixes, and performance.',
+    benefit: 'Peace of mind',
     icon: Shield,
     points: [
-      'Updates, fixes, and careful post-launch support',
-      'Security, monitoring, and performance improvements over time',
-      'A reliable point of contact instead of being left alone after launch',
+      'Continuous updates',
+      'Security monitoring',
+      'Reliable long-term support',
     ],
   },
 ];
-
 const navItems = [
   { label: 'Services', section: 'services' },
   { label: 'Approach', section: 'approach' },
@@ -743,6 +748,7 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
                     <option value="Custom Mobile Apps" className="bg-[#0b0b17]">Custom Mobile Apps</option>
                     <option value="High-Converting Websites" className="bg-[#0b0b17]">High-Converting Websites</option>
                     <option value="Clean UI/UX Design" className="bg-[#0b0b17]">Clean UI/UX Design</option>
+                    <option value="YouTube Thumbnail Optimization">YouTube Thumbnail Optimization</option>
                     <option value="Maintenance & Support" className="bg-[#0b0b17]">Maintenance & Support</option>
                   </select>
                 </label>
