@@ -67,21 +67,6 @@ const services: Service[] = [
     ],
   },
   {
-  id: 'thumbnails',
-  title: 'YouTube Thumbnail Optimization',
-  summary:
-    'Scroll-stopping thumbnails designed to increase clicks, views, and video performance.',
-  detail:
-    'We design high-converting thumbnails using proven viewer psychology, bold visual hierarchy, and platform-specific strategies. Each thumbnail is crafted to grab attention instantly and drive higher click-through rates (CTR), helping your content reach more people.',
-  benefit: 'Increase click-through rate and video views',
-  icon: Image,
-  points: [
-    'CTR-focused designs built using curiosity and emotional triggers',
-    'Clean, high-contrast visuals optimized for mobile viewers',
-    'A/B tested concepts to improve performance over time',
-  ],
-},
-  {
     id: 'design',
     title: 'Clean UI/UX Design',
     summary:
