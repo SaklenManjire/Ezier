@@ -748,6 +748,7 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
                     <option value="Custom Mobile Apps" className="bg-[#0b0b17]">Custom Mobile Apps</option>
                     <option value="High-Converting Websites" className="bg-[#0b0b17]">High-Converting Websites</option>
                     <option value="Clean UI/UX Design" className="bg-[#0b0b17]">Clean UI/UX Design</option>
+                    <option value="Clean UI/UX Design" className="bg-[#0b0b17]">Clean UI/UX Design</option>
                     <option value="Maintenance & Support" className="bg-[#0b0b17]">Maintenance & Support</option>
                   </select>
                 </label>
