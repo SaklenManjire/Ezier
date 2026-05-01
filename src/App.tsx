@@ -739,7 +739,7 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block text-sm text-white/76">
                   Service
-                <select
+               <select
                     value={formData.service}
                     onChange={(event) => setFormData({ ...formData, service: event.target.value })}
                     className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-white/30"
@@ -749,7 +749,6 @@ const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
                     <option value="High-Converting Websites" className="bg-[#0b0b17]">High-Converting Websites</option>
                     <option value="Clean UI/UX Design" className="bg-[#0b0b17]">Clean UI/UX Design</option>
                     <option value="Maintenance & Support" className="bg-[#0b0b17]">Maintenance & Support</option>
-                    <option value="YouTube Thumbnail Optimization" className="bg-[#0b0b17]"YouTube Thumbnail Optimization</option>
                   </select>
                 </label>
                 <label className="block text-sm text-white/76">
